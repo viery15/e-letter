@@ -31,7 +31,14 @@ class component extends CI_Controller
       echo json_encode($response);
     }
 
+    public function list_input(){
+      include APPPATH.'views/data.php';
+
+      echo json_encode($data_type_input);
+    }
+
     public function create(){
+      // header('Content-Type: application/json');
 
       $post = $this->input->post();
       $type = $this->input->post('type');
@@ -120,7 +127,9 @@ class component extends CI_Controller
 
       if (isset($list_attribut)) {
         foreach ($list_attribut as $attribut => $value) {
-          $html = $html . $attribut . '="' . $value . '" ';
+          if ($value != 'false') {
+            $html = $html . $attribut . '="' . $value . '" ';
+          }
         }
       }
 
