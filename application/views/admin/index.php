@@ -41,7 +41,7 @@
         </div>
       </div>
       <div id="modal-form" class="modal fade" role="dialog">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg" style="max-width:900px">
           <!-- Modal content-->
           <div class="modal-content ">
             <div class="modal-header">
@@ -69,9 +69,12 @@
                     </select>
                   </div>
                   </form>
+
+                </div>
+                <div class="col-md-6">
                   <div v-if="inputComponent.type == 'radio' || inputComponent.type == 'checkbox' || inputComponent.type == 'dropdown'">
                     <h6>Option Setting</h6><hr />
-                    <div v-for="option in options">
+                    <div v-for="(option, index) in options">
                       <div class="form-group">
                         <label for="usr">Option {{option.countOption}}: </label>
                         <div class="row">
@@ -79,7 +82,7 @@
                               <input :placeholder="'option '+ option.countOption" v-model="option.option" style="width:90%" autocomplete="off" type="text" class="form-control">
                           </div>
                           <div class="col-md-1">
-                            <button v-if="option.countOption != 1" class="btn btn-danger btn-sm pull-right"><i class="fa fa-close"></i></button>
+                            <button v-on:click="removeOption(index)" v-if="option.countOption != 1" class="btn btn-danger btn-sm pull-right"><i class="fa fa-close"></i></button>
                           </div>
                         </div>
                       </div>
@@ -89,20 +92,31 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
+              </div>
+              <div class="row">
+
+
+                <div class="col-md-12">
                   <h6>Attribut Setting</h6><hr />
-                  <div class="row" v-for="attribut in attributs">
+                  <div class="row" v-for="(attribut, index) in attributs">
                     <div class="col-md-6">
                       <div class="form-group">
                         <label for="usr">Attribut {{attribut.count}}: </label>
                         <input :placeholder="'attribut ' + attribut.count" v-model="attribut.attribut" autocomplete="off" type="text" class="form-control">
                       </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                       <div class="form-group">
                         <label for="usr">Value {{attribut.count}} :  </label>
                         <input :placeholder="'value ' + attribut.count" v-model="attribut.value" autocomplete="off" type="text" class="form-control">
                       </div>
+                    </div>
+                    <div class="col-md-1">
+                      <div class="form-group">
+                        <br />
+                        <button v-on:click="removeAttribut(index)" v-if="attribut.count != 1" class="btn btn-danger btn-sm pull-right"><i class="fa fa-close"></i></button>
+                      </div>
+
                     </div>
                   </div>
                   <div class="text-center">

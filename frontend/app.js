@@ -155,7 +155,7 @@ new Vue({
 
       axios.post('/e-letter/component/create', newComponent)
       .then((response) => {
-        console.log(response.data)
+
         this.init()
         $('#modal-form').modal('hide');
         Swal.fire({
@@ -187,7 +187,7 @@ new Vue({
 
       axios.post('/e-letter/component/update/'+id, newComponent)
       .then((response) => {
-        console.log(response.data)
+
         this.init()
         $('#modal-form').modal('hide');
         Swal.fire({
@@ -244,7 +244,7 @@ new Vue({
       this.inputComponent.type = this.components.find(x => x.id === id).attribut.type
       this.inputComponent.name = this.components.find(x => x.id === id).name
       this.inputComponent.variable_name = this.components.find(x => x.id === id).variable_name
-      // console.log(this.inputComponent)
+      
       if (this.inputComponent.type == 'radio' || this.inputComponent.type == 'checkbox' || this.inputComponent.type == 'dropdown') {
         option = this.components.find(x => x.id === id).option
       }
@@ -268,11 +268,11 @@ new Vue({
               value: attribut[key],
               count: j+1
               }
-            
+            j++;
           }
          }
-         j++;
       }
+
 
     },
 
@@ -283,6 +283,8 @@ new Vue({
     },
 
     addAttribut() {
+      this.count = this.attributs.length
+
       this.attributs.push({
         attribut: '',
         count: ++this.count
@@ -290,6 +292,7 @@ new Vue({
     },
 
     addOption() {
+      this.countOption = this.options.length
       this.options.push({
         option: '',
         countOption: ++this.countOption
@@ -298,7 +301,17 @@ new Vue({
 
     view(id) {
       this.view_data = this.components.find(x => x.id === id)
-      console.log(this.view_data)
+
+    },
+
+    removeOption(index) {
+      this.options.splice(index, 1)
+
+    },
+
+    removeAttribut(index) {
+      this.attributs.splice(index, 1)
+
     }
   }
 });
