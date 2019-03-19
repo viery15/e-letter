@@ -6,7 +6,7 @@ class M_component extends CI_Model
 
     public function getAll(){
       $this->db->order_by('id','DESC');
-      return $this->db->get($this->_table)->result();
+      return $this->db->get($this->_table)->result_array();
     }
 
     public function save($input){

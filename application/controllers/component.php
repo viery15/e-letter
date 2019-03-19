@@ -18,6 +18,53 @@ class component extends CI_Controller
       echo json_encode($data);
     }
 
+    public function index2()
+    {
+      $data = $this->M_component->getAll();
+      for ($i=0; $i < count($data); $i++) {
+        $new_data[$i]['html_basic'] = '';
+        foreach ($data[$i] as $key => $value) {
+          if ($key == 'html_basic') {
+            $attribut = json_decode($data[$i]['html_basic'], true);
+
+            $count_attribut = count($attribut);
+            foreach ($attribut as $attribut => $value) {
+
+              if ($attribut != 'name' && $attribut != 'variable_name') {
+                if ($attribut == 'type') {
+                  if ($value == 'text' || $value == 'number') {
+                    $new_data[$i]['html_basic'] = '<input type="text" class="form-control" ';
+                  }
+                  elseif ($value == 'textarea') {
+                    $new_data[$i]['html_basic'] = '<textarea class="form-control" ';
+                  }
+                }
+                else {
+                  $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . $attribut . '="' . $value . '" ';
+
+                }
+
+                $new_data[$i]['attribut'][$attribut] = $value;
+
+              }
+            }
+          }
+          else {
+            $new_data[$i][$key] = $data[$i][$key];
+          }
+        }
+        if ($new_data[$i]['attribut']['type'] == 'text' || $new_data[$i]['attribut']['type'] == 'number') {
+          $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '>';
+        }
+        elseif ($new_data[$i]['attribut']['type'] == 'textarea') {
+          $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '></textarea>';
+        }
+      }
+
+      echo json_encode($new_data);
+
+    }
+
     public function delete($id)
     {
       $return = $this->M_component->delete($id);
@@ -41,31 +88,37 @@ class component extends CI_Controller
       // header('Content-Type: application/json');
 
       $post = $this->input->post();
-      $type = $this->input->post('type');
-      $variable_name = $this->input->post('variable_name');
-      $name = $this->input->post('name');
 
-      if ($type == 'text' || $type == 'number' || $type == 'textarea' || $type == 'date') {
-        $html = $this->input_text();
-      }
-      elseif ($type == 'radio') {
-        $html = $this->input_radio();
-      }
 
-      $input['name'] = $post['name'];
-      $input['variable_name'] = $variable_name;
-      $input['html_basic'] = $html;
+      // $input['type'] = $this->input->post('type');
+      $input['variable_name'] = $this->input->post('variable_name');
+      $input['name'] = $this->input->post('name');
+      $input['html_basic'] = json_encode($post);
 
+      print_r($input);
+      //
+      // if ($type == 'text' || $type == 'number' || $type == 'textarea' || $type == 'date') {
+      //   $html = $this->input_text2();
+      // }
+      // elseif ($type == 'radio') {
+      //   $html = $this->input_radio();
+      // }
+      //
+      // $input['name'] = $post['name'];
+      // $input['variable_name'] = $variable_name;
+      // $input['html_basic'] = $html;
+      //
       $status = $this->M_component->save($input);
-
-      if ($status == 'success') {
-        $response = [
-          'msg' => 'Data saved successful',
-          'data' => $input
-        ];
-
-        echo json_encode($response);
-      }
+      echo $status;
+      //
+      // if ($status == 'success') {
+      //   $response = [
+      //     'msg' => 'Data saved successful',
+      //     'data' => $input
+      //   ];
+      //
+      //   echo json_encode($response);
+      // }
     }
 
     //radio button
@@ -142,5 +195,15 @@ class component extends CI_Controller
 
       return $html;
 
+    }
+
+    public function input_text2(){
+      $post = $this->input->post();
+      $type = $this->input->post('type');
+      $name = $this->input->post('name');
+      $variable_name = $this->input->post('variable_name');
+      $post_keys = array_keys($post);
+
+      print_r($post);
     }
 }

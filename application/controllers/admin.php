@@ -15,4 +15,9 @@ class admin extends CI_Controller
     {
       $this->load->view('admin/index');
     }
+
+    public function component()
+    {
+      $this->load->view('admin/component');
+    }
 }

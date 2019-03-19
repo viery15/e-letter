@@ -76,18 +76,24 @@ new Vue({
       data_input: [],
       selected_type: '',
       inputComponent: {},
-      alert: false
+      alert: false,
+      attributs: [{
+        attribut: '',
+        value: '',
+        count: 1
+        }
+      ],
+      count: 1
     }
   },
 
   mounted() {
     this.init()
-
   },
 
   methods: {
     async init(){
-      const response = await axios.get('/e-letter/component')
+      const response = await axios.get('/e-letter/component/index2')
       this.components = response.data
       $(this.$refs.vuemodal).hide()
     },
@@ -128,9 +134,9 @@ new Vue({
       newComponent.append('name', this.inputComponent.name)
       newComponent.append('variable_name', this.inputComponent.variable_name)
       newComponent.append('type', this.inputComponent.type)
-      newComponent.append('placeholder', store.state.placeholder)
-      newComponent.append('autocomplete', store.state.autocomplete)
-      newComponent.append('readonly', store.state.readonly)
+      for (var i = 0; i < this.attributs.length; i++) {
+        newComponent.append(this.attributs[i].attribut, this.attributs[i].value)
+      }
 
       axios.post('/e-letter/component/create', newComponent)
       .then((response) => {
@@ -145,7 +151,7 @@ new Vue({
         })
       })
       .catch((e) => {
-        console.error(e)
+        console.log(e)
       })
     },
 
@@ -153,7 +159,13 @@ new Vue({
       this.modal_header = 'New Component'
       const response = await axios.get('/e-letter/component/list_input')
       this.data_input = response.data
-      this.inputComponent ={}
+      this.attributs = [{
+        attribut: '',
+        value: '',
+        count: 1
+        }
+      ]
+      this.inputComponent = {}
     },
 
     updateComponent(){
@@ -164,5 +176,12 @@ new Vue({
       this.selected_type = event.target.value
       this.inputComponent.type = event.target.value
     },
+
+    addAttribut() {
+      this.attributs.push({
+        attribut: '',
+        count: ++this.count
+      });
+    }
   }
 });
