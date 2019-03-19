@@ -71,11 +71,13 @@ new Vue({
   data: function(){
     return {
       columns: ['Name', 'Variable Name', 'HTML Basic'],
+      inputType: ['text','number','textarea','date','radio','checkbox','dropdown'],
       components: [],
       modal_header: '',
       data_input: [],
       selected_type: '',
       inputComponent: {},
+      view_data:[],
       alert: false,
       attributs: [{
         attribut: '',
@@ -83,7 +85,15 @@ new Vue({
         count: 1
         }
       ],
-      count: 1
+      count: 1,
+
+      options: [{
+        option: '',
+        countOption: 1
+        }
+      ],
+      countOptions: 1,
+
     }
   },
 
@@ -102,7 +112,7 @@ new Vue({
       axios.delete('/e-letter/component/delete/' + id)
       .then(response => {
         this.init()
-      });
+      })
     },
 
     destroy(id) {
@@ -137,9 +147,15 @@ new Vue({
       for (var i = 0; i < this.attributs.length; i++) {
         newComponent.append(this.attributs[i].attribut, this.attributs[i].value)
       }
+      for (var i = 0; i < this.options.length; i++) {
+        if (this.options[i].option != '') {
+          newComponent.append('option[]', this.options[i].option)
+        }
+      }
 
       axios.post('/e-letter/component/create', newComponent)
       .then((response) => {
+        console.log(response.data)
         this.init()
         $('#modal-form').modal('hide');
         Swal.fire({
@@ -155,26 +171,115 @@ new Vue({
       })
     },
 
+    updateComponent(id){
+      const newComponent = new URLSearchParams()
+      newComponent.append('name', this.inputComponent.name)
+      newComponent.append('variable_name', this.inputComponent.variable_name)
+      newComponent.append('type', this.inputComponent.type)
+      for (var i = 0; i < this.attributs.length; i++) {
+        newComponent.append(this.attributs[i].attribut, this.attributs[i].value)
+      }
+      for (var i = 0; i < this.options.length; i++) {
+        if (this.options[i].option != '') {
+          newComponent.append('option[]', this.options[i].option)
+        }
+      }
+
+      axios.post('/e-letter/component/update/'+id, newComponent)
+      .then((response) => {
+        console.log(response.data)
+        this.init()
+        $('#modal-form').modal('hide');
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Data updated successful',
+          showConfirmButton: false,
+          timer: 1500
+        })
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+    },
+
     async newComponent(){
       this.modal_header = 'New Component'
       const response = await axios.get('/e-letter/component/list_input')
       this.data_input = response.data
+      this.count = 1
+      this.countOption = 1
       this.attributs = [{
         attribut: '',
         value: '',
         count: 1
         }
       ]
+      this.options = [{
+        option: '',
+        countOption: 1
+        }
+      ]
+
       this.inputComponent = {}
     },
 
-    updateComponent(){
-      this.modal_header = 'Update Component'
+    editComponent(id){
+      this.options = [{
+        option: '',
+        countOption: 1
+        }
+      ]
+      this.attributs = [{
+        attribut: '',
+        value: '',
+        count: 1
+        }
+      ]
+      var option = {}
+      var attribut = {}
+      this.inputComponent = {}
+      this.modal_header = 'Edit Component'
+      this.inputComponent.id = id
+      this.inputComponent.type = this.components.find(x => x.id === id).attribut.type
+      this.inputComponent.name = this.components.find(x => x.id === id).name
+      this.inputComponent.variable_name = this.components.find(x => x.id === id).variable_name
+      // console.log(this.inputComponent)
+      if (this.inputComponent.type == 'radio' || this.inputComponent.type == 'checkbox' || this.inputComponent.type == 'dropdown') {
+        option = this.components.find(x => x.id === id).option
+      }
+      attribut = this.components.find(x => x.id === id).attribut
+
+      if (option !== "undefined") {
+        for (var i = 0; i < option.length; i++) {
+          this.options[i] = {
+            option: option[i],
+            countOption: i+1
+            }
+        }
+      }
+
+      var j = 0
+      for (var key in attribut) {
+        if (attribut.hasOwnProperty(key)) {
+          if (key != "type") {
+            this.attributs[j] = {
+              attribut: key,
+              value: attribut[key],
+              count: j+1
+              }
+            
+          }
+         }
+         j++;
+      }
+
     },
 
     onChange(event) {
       this.selected_type = event.target.value
       this.inputComponent.type = event.target.value
+
     },
 
     addAttribut() {
@@ -182,6 +287,18 @@ new Vue({
         attribut: '',
         count: ++this.count
       });
+    },
+
+    addOption() {
+      this.options.push({
+        option: '',
+        countOption: ++this.countOption
+      });
+    },
+
+    view(id) {
+      this.view_data = this.components.find(x => x.id === id)
+      console.log(this.view_data)
     }
   }
 });

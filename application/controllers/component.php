@@ -30,7 +30,7 @@ class component extends CI_Controller
             $count_attribut = count($attribut);
             foreach ($attribut as $attribut => $value) {
 
-              if ($attribut != 'name' && $attribut != 'variable_name') {
+              if ($attribut != 'name' && $attribut != 'variable_name' && $attribut != 'option') {
                 if ($attribut == 'type') {
                   if ($value == 'text' || $value == 'number') {
                     $new_data[$i]['html_basic'] = '<input type="text" class="form-control" ';
@@ -38,14 +38,43 @@ class component extends CI_Controller
                   elseif ($value == 'textarea') {
                     $new_data[$i]['html_basic'] = '<textarea class="form-control" ';
                   }
+                  elseif ($value == 'date') {
+                    $new_data[$i]['html_basic'] = '<input type="date" class="form-control" ';
+                  }
                 }
-                else {
+                if($attribut != 'type' && $attribut != 'option') {
                   $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . $attribut . '="' . $value . '" ';
 
                 }
 
                 $new_data[$i]['attribut'][$attribut] = $value;
+              }
+              elseif ($attribut == 'option') {
+                $new_data[$i]['option'] = $value;
+                if ($new_data[$i]['attribut']['type'] == 'radio') {
+                  for ($o=0; $o < count($new_data[$i]['option']); $o++) {
+                    $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '<div class="form-check-inline">';
+                    $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '<label class="form-check-label">';
+                    $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '<input type="radio" name="' . $data[$i]['variable_name'] . '" value="' . $new_data[$i]['option'][$o] . '"/>&nbsp; ' . $new_data[$i]['option'][$o];
+                    $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '</label></div>';
+                  }
+                }
 
+                elseif ($new_data[$i]['attribut']['type'] == 'dropdown') {
+                  $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '<select class="form-control">';
+                  for ($o=0; $o < count($new_data[$i]['option']); $o++) {
+                    $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '<option value="' . $new_data[$i]['option'][$o] . '">' . $new_data[$i]['option'][$o] . '</option>';
+                  }
+                }
+
+                elseif ($new_data[$i]['attribut']['type'] == 'checkbox') {
+                  for ($o=0; $o < count($new_data[$i]['option']); $o++) {
+                    $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '<div class="form-check-inline">';
+                    $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '<label class="form-check-label">';
+                    $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '<input type="checkbox" name="' . $data[$i]['variable_name'] . '" value="' . $new_data[$i]['option'][$o] . '"/>' . $new_data[$i]['option'][$o];
+                    $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '</label></div>';
+                  }
+                }
               }
             }
           }
@@ -53,15 +82,20 @@ class component extends CI_Controller
             $new_data[$i][$key] = $data[$i][$key];
           }
         }
-        if ($new_data[$i]['attribut']['type'] == 'text' || $new_data[$i]['attribut']['type'] == 'number') {
+        if ($new_data[$i]['attribut']['type'] == 'text' || $new_data[$i]['attribut']['type'] == 'number' || $new_data[$i]['attribut']['type'] == 'date') {
           $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '>';
         }
         elseif ($new_data[$i]['attribut']['type'] == 'textarea') {
           $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '></textarea>';
         }
+        elseif ($new_data[$i]['attribut']['type'] == 'dropdown') {
+          $new_data[$i]['html_basic'] = $new_data[$i]['html_basic'] . '</select>';
+        }
       }
 
-      echo json_encode($new_data);
+      if (isset($new_data)) {
+        echo json_encode($new_data);
+      }
 
     }
 
@@ -85,40 +119,31 @@ class component extends CI_Controller
     }
 
     public function create(){
-      // header('Content-Type: application/json');
-
       $post = $this->input->post();
 
-
-      // $input['type'] = $this->input->post('type');
       $input['variable_name'] = $this->input->post('variable_name');
       $input['name'] = $this->input->post('name');
       $input['html_basic'] = json_encode($post);
 
+      echo json_encode($post);
+
+      $status = $this->M_component->save($input);
+
+    }
+
+    public function update($id){
+      $post = $this->input->post();
+      // print_r($post);
+      // print_r($id);
+
+      $input['variable_name'] = $this->input->post('variable_name');
+      $input['name'] = $this->input->post('name');
+      $input['html_basic'] = json_encode($post);
+      //
       print_r($input);
       //
-      // if ($type == 'text' || $type == 'number' || $type == 'textarea' || $type == 'date') {
-      //   $html = $this->input_text2();
-      // }
-      // elseif ($type == 'radio') {
-      //   $html = $this->input_radio();
-      // }
-      //
-      // $input['name'] = $post['name'];
-      // $input['variable_name'] = $variable_name;
-      // $input['html_basic'] = $html;
-      //
-      $status = $this->M_component->save($input);
-      echo $status;
-      //
-      // if ($status == 'success') {
-      //   $response = [
-      //     'msg' => 'Data saved successful',
-      //     'data' => $input
-      //   ];
-      //
-      //   echo json_encode($response);
-      // }
+      $status = $this->M_component->update($id,$input);
+
     }
 
     //radio button

@@ -21,10 +21,10 @@ class M_component extends CI_Model
       return 'success';
     }
 
-    public function update($id) {
-      $post = $this->input->post();
+    public function update($id, $input) {
+      // $post = $this->input->post();
 
-      $this->db->update($this->_table, $this, array('id' => $id));
+      $this->db->update($this->_table, $input, array('id' => $id));
     }
 
 }

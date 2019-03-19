@@ -26,12 +26,14 @@
                 <th style="text-align:center" v-for='column in columns'>{{column}}</th>
                 <th style="text-align:center">Action</th>
               </tr>
-              <tr v-for='component in components'>
+              <tr v-if="component.length !== 0" v-for='component in components'>
                 <td width='20%'>{{component.name}}</td>
                 <td width='20%'>{{component.variable_name}}</td>
                 <td>{{component.html_basic}}</td>
                 <td style="text-align:center" width='15%'>
+                  <button v-on:click="editComponent(component.id)" class="btn btn-md btn-warning" data-toggle="modal" data-target="#modal-form"><i class="fa fa-pencil"> </i></button>
                   <button v-on:click="destroy(component.id)" class="btn btn-md btn-danger"><i class="fa fa-trash"> </i></button>
+                  <button v-on:click="view(component.id)" class="btn btn-md btn-info " data-toggle="modal" data-target="#modal-view"><i class="fa fa-eye"> </i></button>
                 </td>
               </tr>
             </table>
@@ -63,12 +65,30 @@
                     <label for="sel1">Input type: * </label>
                     <select v-on:change="onChange($event)" class="form-control" v-model="inputComponent.type">
                       <option value="" disabled selected>Select input type</option>
-                      <option v-for='(value, key) in data_input' v-bind="key">{{key}}</option>
+                      <option v-for='input in inputType'>{{input}}</option>
                     </select>
                   </div>
                   </form>
+                  <div v-if="inputComponent.type == 'radio' || inputComponent.type == 'checkbox' || inputComponent.type == 'dropdown'">
+                    <h6>Option Setting</h6><hr />
+                    <div v-for="option in options">
+                      <div class="form-group">
+                        <label for="usr">Option {{option.countOption}}: </label>
+                        <div class="row">
+                          <div class="col-md-11">
+                              <input :placeholder="'option '+ option.countOption" v-model="option.option" style="width:90%" autocomplete="off" type="text" class="form-control">
+                          </div>
+                          <div class="col-md-1">
+                            <button v-if="option.countOption != 1" class="btn btn-danger btn-sm pull-right"><i class="fa fa-close"></i></button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-center">
+                      <button v-on:click="addOption()" v-if="inputComponent.type == 'radio' || inputComponent.type == 'checkbox' || inputComponent.type == 'dropdown'" class="btn btn-success btn-sm center"><i class="fa fa-plus"></i></button>
+                    </div>
+                  </div>
                 </div>
-
                 <div class="col-md-6">
                   <h6>Attribut Setting</h6><hr />
                   <div class="row" v-for="attribut in attributs">
@@ -91,9 +111,30 @@
                 </div>
               </div>
             </div>
-
             <div class="modal-footer">
-              <button v-on:click="addComponent()" type="button" class="btn btn-save btn-success">Save</button>
+              <button v-if="modal_header == 'New Component'" v-on:click="addComponent()" type="button" class="btn btn-save btn-success">Save</button>
+              <button v-if="modal_header == 'Edit Component'" v-on:click="updateComponent(inputComponent.id)" type="button" class="btn btn-save btn-success">Update</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- MODAL VIEW  -->
+
+      <div id="modal-view" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-md">
+          <!-- Modal content-->
+          <div class="modal-content ">
+            <div class="modal-header">
+              <h5 class="modal-title" v-html="view_data.name"></h5>
+              <button type="button" class="pull-right close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div v-html="view_data.html_basic"></div>
+            </div>
+            <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
           </div>
