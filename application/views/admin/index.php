@@ -11,6 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.8/dist/vue.js"></script>
     <script src="https://unpkg.com/vuex@3.1.0/dist/vuex.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vee-validate@latest/dist/vee-validate.js"></script>
 
     <title>e-Letter</title>
   </head>
@@ -54,19 +55,22 @@
                   <h6>Basic Setting</h6><hr />
                   <form id='input-component'>
                   <div class="form-group">
-                    <label for="usr">Name: * </label>
-                    <input autocomplete="off" v-model="inputComponent.name" type="text" class="form-control">
+                    <label for="usr">Name: * </label><br />
+                    <input name="name" v-validate="'required'" autocomplete="off" v-model="inputComponent.name" type="text" class="form-control">
+                    <span style="color:red">{{ errors.first('name') }}</span>
                   </div>
                   <div class="form-group">
                     <label for="usr">Variable Name: * </label>
-                    <input autocomplete="off" v-model="inputComponent.variable_name" type="text" class="form-control">
+                    <input v-validate="'required'" name="variable_name" autocomplete="off" v-model="inputComponent.variable_name" type="text" class="form-control">
+                    <span style="color:red">{{ errors.first('variable_name') }}</span>
                   </div>
                   <div class="form-group">
                     <label for="sel1">Input type: * </label>
-                    <select v-on:change="onChange($event)" class="form-control" v-model="inputComponent.type">
+                    <select name="type" v-validate="'required'" v-on:change="onChange($event)" class="form-control" v-model="inputComponent.type">
                       <option value="" disabled selected>Select input type</option>
                       <option v-for='input in inputType'>{{input}}</option>
                     </select>
+                    <span style="color:red">{{ errors.first('type') }}</span>
                   </div>
                   </form>
 
@@ -79,10 +83,11 @@
                         <label for="usr">Option {{option.countOption}}: </label>
                         <div class="row">
                           <div class="col-md-11">
-                              <input :placeholder="'option '+ option.countOption" v-model="option.option" style="width:90%" autocomplete="off" type="text" class="form-control">
+                              <input :name="'option'+option.countOption" v-validate="'required'" :placeholder="'option '+ option.countOption" v-model="option.option" style="width:90%" autocomplete="off" type="text" class="form-control">
+                              <span style="color:red">{{ errors.first('option'+option.countOption) }}</span>
                           </div>
                           <div class="col-md-1">
-                            <button v-on:click="removeOption(index)" v-if="option.countOption != 1" class="btn btn-danger btn-sm pull-right"><i class="fa fa-close"></i></button>
+                            <button v-on:click="removeOption(index)" v-if="options.length > 1" class="btn btn-danger btn-sm pull-right"><i class="fa fa-close"></i></button>
                           </div>
                         </div>
                       </div>
@@ -114,7 +119,7 @@
                     <div class="col-md-1">
                       <div class="form-group">
                         <br />
-                        <button v-on:click="removeAttribut(index)" v-if="attribut.count != 1" class="btn btn-danger btn-sm pull-right"><i class="fa fa-close"></i></button>
+                        <button v-on:click="removeAttribut(index)" v-if="attributs.length > 1" class="btn btn-danger btn-sm pull-right"><i class="fa fa-close"></i></button>
                       </div>
 
                     </div>
@@ -126,7 +131,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button v-if="modal_header == 'New Component'" v-on:click="addComponent()" type="button" class="btn btn-save btn-success">Save</button>
+              <button v-if="modal_header == 'New Component'" v-on:click="addComponent()" type="button" class="btn btn-save btn-success" >Save</button>
               <button v-if="modal_header == 'Edit Component'" v-on:click="updateComponent(inputComponent.id)" type="button" class="btn btn-save btn-success">Update</button>
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>

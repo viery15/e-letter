@@ -1,3 +1,5 @@
+Vue.use(VeeValidate)
+
 const store = new Vuex.Store({
   state: {
     count: 8,
@@ -99,6 +101,8 @@ new Vue({
 
   mounted() {
     this.init()
+
+
   },
 
   methods: {
@@ -140,70 +144,81 @@ new Vue({
     },
 
     addComponent(){
-      const newComponent = new URLSearchParams()
-      newComponent.append('name', this.inputComponent.name)
-      newComponent.append('variable_name', this.inputComponent.variable_name)
-      newComponent.append('type', this.inputComponent.type)
-      for (var i = 0; i < this.attributs.length; i++) {
-        newComponent.append(this.attributs[i].attribut, this.attributs[i].value)
-      }
-      for (var i = 0; i < this.options.length; i++) {
-        if (this.options[i].option != '') {
-          newComponent.append('option[]', this.options[i].option)
-        }
-      }
+      this.$validator.validate().then(valid => {
+          if (valid) {
+            const newComponent = new URLSearchParams()
+            newComponent.append('name', this.inputComponent.name)
+            newComponent.append('variable_name', this.inputComponent.variable_name)
+            newComponent.append('type', this.inputComponent.type)
+            for (var i = 0; i < this.attributs.length; i++) {
+              newComponent.append(this.attributs[i].attribut, this.attributs[i].value)
+            }
+            for (var i = 0; i < this.options.length; i++) {
+              if (this.options[i].option != '') {
+                newComponent.append('option[]', this.options[i].option)
+              }
+            }
 
-      axios.post('/e-letter/component/create', newComponent)
-      .then((response) => {
+            axios.post('/e-letter/component/create', newComponent)
+            .then((response) => {
 
-        this.init()
-        $('#modal-form').modal('hide');
-        Swal.fire({
-          position: 'top-end',
-          type: 'success',
-          title: 'Data saved successful',
-          showConfirmButton: false,
-          timer: 1500
+              this.init()
+              $('#modal-form').modal('hide');
+              Swal.fire({
+                position: 'top-end',
+                type: 'success',
+                title: 'Data saved successful',
+                showConfirmButton: false,
+                timer: 1500
+              })
+            })
+            .catch((e) => {
+              console.log(e)
+            })
+          }
         })
-      })
-      .catch((e) => {
-        console.log(e)
-      })
     },
 
     updateComponent(id){
-      const newComponent = new URLSearchParams()
-      newComponent.append('name', this.inputComponent.name)
-      newComponent.append('variable_name', this.inputComponent.variable_name)
-      newComponent.append('type', this.inputComponent.type)
-      for (var i = 0; i < this.attributs.length; i++) {
-        newComponent.append(this.attributs[i].attribut, this.attributs[i].value)
-      }
-      for (var i = 0; i < this.options.length; i++) {
-        if (this.options[i].option != '') {
-          newComponent.append('option[]', this.options[i].option)
-        }
-      }
+      this.$validator.validate().then(valid => {
+          if (valid) {
+            const newComponent = new URLSearchParams()
+            newComponent.append('name', this.inputComponent.name)
+            newComponent.append('variable_name', this.inputComponent.variable_name)
+            newComponent.append('type', this.inputComponent.type)
+            for (var i = 0; i < this.attributs.length; i++) {
+              newComponent.append(this.attributs[i].attribut, this.attributs[i].value)
+            }
+            for (var i = 0; i < this.options.length; i++) {
+              if (this.options[i].option != '') {
+                newComponent.append('option[]', this.options[i].option)
+              }
+            }
 
-      axios.post('/e-letter/component/update/'+id, newComponent)
-      .then((response) => {
+            axios.post('/e-letter/component/update/'+id, newComponent)
+            .then((response) => {
 
-        this.init()
-        $('#modal-form').modal('hide');
-        Swal.fire({
-          position: 'top-end',
-          type: 'success',
-          title: 'Data updated successful',
-          showConfirmButton: false,
-          timer: 1500
+              this.init()
+              $('#modal-form').modal('hide');
+              Swal.fire({
+                position: 'top-end',
+                type: 'success',
+                title: 'Data updated successful',
+                showConfirmButton: false,
+                timer: 1500
+              })
+            })
+            .catch((e) => {
+              console.log(e)
+            })
+          }
+
         })
-      })
-      .catch((e) => {
-        console.log(e)
-      })
+
     },
 
     async newComponent(){
+      this.errors.clear()
       this.modal_header = 'New Component'
       const response = await axios.get('/e-letter/component/list_input')
       this.data_input = response.data
@@ -225,6 +240,7 @@ new Vue({
     },
 
     editComponent(id){
+      this.errors.clear()
       this.options = [{
         option: '',
         countOption: 1
@@ -244,7 +260,7 @@ new Vue({
       this.inputComponent.type = this.components.find(x => x.id === id).attribut.type
       this.inputComponent.name = this.components.find(x => x.id === id).name
       this.inputComponent.variable_name = this.components.find(x => x.id === id).variable_name
-      
+
       if (this.inputComponent.type == 'radio' || this.inputComponent.type == 'checkbox' || this.inputComponent.type == 'dropdown') {
         option = this.components.find(x => x.id === id).option
       }
@@ -272,7 +288,6 @@ new Vue({
           }
          }
       }
-
 
     },
 
@@ -312,6 +327,6 @@ new Vue({
     removeAttribut(index) {
       this.attributs.splice(index, 1)
 
-    }
+    },
   }
 });
